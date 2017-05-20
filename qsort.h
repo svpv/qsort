@@ -46,12 +46,15 @@ do {					\
 do {									\
     /* The middle element, not to be confused with the median. */	\
     Q_UINT q_m = q_l + ((q_r - q_l) >> 1);				\
-    /* Sort 3 items so that the smallest is placed in the middle,	\
-     * the median at the beginning, and the largest at the end. */	\
-    Q_SORT3(q_m, q_l, q_r);						\
-    /* The smallest element should not remain in the middle,		\
-     * place it right after the median. */				\
-    Q_SWAP(q_m, q_l + 1);						\
+    /* Reorder the second, the middle, and the last items.		\
+     * As [Edelkamp Weiss 2016] explain, using the second element	\
+     * instead of the first one helps avoid bad behaviour for		\
+     * decreasingly sorted arrays.  This method is used in recent	\
+     * versions of gcc's std::sort, see gcc bug 58437#c13, although	\
+     * the details are somewhat different (cf. #c14). */		\
+    Q_SORT3(q_l + 1, q_m, q_r);						\
+    /* Place the median at the beginning. */				\
+    Q_SWAP(q_l, q_m);							\
     /* Partition [q_l+2, q_r-1] around the median which is in q_l.	\
      * q_i and q_j are initially off by one, they get decremented	\
      * in the do-while loops. */					\
