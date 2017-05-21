@@ -21,28 +21,28 @@
  */
 
 /* Sort 3 elements. */
-#define Q_SORT3(a1, a2, a3)		\
+#define Q_SORT3(q_a1, q_a2, q_a3, Q_LESS, Q_SWAP) \
 do {					\
-    if (Q_LESS(a2, a1)) {		\
-	if (Q_LESS(a3, a2))		\
-	    Q_SWAP(a1, a3);		\
+    if (Q_LESS(q_a2, q_a1)) {		\
+	if (Q_LESS(q_a3, q_a2))		\
+	    Q_SWAP(q_a1, q_a3);		\
 	else {				\
-	    Q_SWAP(a1, a2);		\
-	    if (Q_LESS(a3, a2))		\
-		Q_SWAP(a2, a3);		\
+	    Q_SWAP(q_a1, q_a2);		\
+	    if (Q_LESS(q_a3, q_a2))	\
+		Q_SWAP(q_a2, q_a3);	\
 	}				\
     }					\
-    else if (Q_LESS(a3, a2)) {		\
-	Q_SWAP(a2, a3);			\
-	if (Q_LESS(a2, a1))		\
-	    Q_SWAP(a1, a2);		\
+    else if (Q_LESS(q_a3, q_a2)) {	\
+	Q_SWAP(q_a2, q_a3);		\
+	if (Q_LESS(q_a2, q_a1))		\
+	    Q_SWAP(q_a1, q_a2);		\
     }					\
 } while (0)
 
 /* Partition [q_l,q_r] around a pivot.  After partitioning,
  * [q_l,q_j] are the elements that are less than or equal to the pivot,
  * while [q_i,q_r] are the elements greater than or equal to the pivot. */
-#define Q_PARTITION(q_l, q_r, q_i, q_j)					\
+#define Q_PARTITION(q_l, q_r, q_i, q_j, Q_UINT, Q_LESS, Q_SWAP)		\
 do {									\
     /* The middle element, not to be confused with the median. */	\
     Q_UINT q_m = q_l + ((q_r - q_l) >> 1);				\
@@ -52,7 +52,7 @@ do {									\
      * decreasingly sorted arrays.  This method is used in recent	\
      * versions of gcc's std::sort, see gcc bug 58437#c13, although	\
      * the details are somewhat different (cf. #c14). */		\
-    Q_SORT3(q_l + 1, q_m, q_r);						\
+    Q_SORT3(q_l + 1, q_m, q_r, Q_LESS, Q_SWAP);				\
     /* Place the median at the beginning. */				\
     Q_SWAP(q_l, q_m);							\
     /* Partition [q_l+2, q_r-1] around the median which is in q_l.	\
