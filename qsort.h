@@ -73,4 +73,21 @@ do {									\
     q_j--;								\
 } while (0)
 
+/* Insertion sort is applied to small subfiles - this is contrary to
+ * Sedgewick's suggestion to run a separate insertion sort pass after
+ * the partitioning is done.  The reason I don't like a separate pass
+ * is that it triggers extra comparisons, because it can't see that the
+ * medians are already in their final positions and need not be rechecked.
+ * Since I do not assume that comparisons are cheap, I also do not try
+ * to eliminate the (q_j > q_l) boundary check. */
+#define Q_INSERTION_SORT(q_l, q_r, Q_UINT, Q_LESS, Q_SWAP)		\
+do {									\
+    Q_UINT q_i, q_j;							\
+    /* For each item starting with the second... */			\
+    for (q_i = q_l + 1; q_i <= q_r; q_i++)				\
+    /* move it down the array so that the first part is sorted. */	\
+    for (q_j = q_i; q_j > q_l && (Q_LESS(q_j, q_j - 1)); q_j--)		\
+	Q_SWAP(q_j, q_j - 1);						\
+} while (0)
+
 /* ex:set ts=8 sts=4 sw=4 noet: */
