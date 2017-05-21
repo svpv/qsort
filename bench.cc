@@ -72,6 +72,7 @@ void svpv_isort(int A[], size_t n)
 #define ILESS(i, j) (NCMPINC, A[i] < A[j])
 #define SWAP(i, j) tmp = A[i], A[i] = A[j], A[j] = tmp
     QSORT(n, ILESS, SWAP);
+#undef QSORT
 }
 
 /*
@@ -108,6 +109,7 @@ void mjt_strsort(const char *A[], size_t n)
 #undef QSORT
 }
 
+#undef QSORT_H
 #include "qsort.h"
 void svpv_strsort(const char *A[], size_t n)
 {

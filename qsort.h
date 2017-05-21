@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#ifndef QSORT_H
+#define QSORT_H
+
 /* Sort 3 elements. */
 #define Q_SORT3(q_a1, q_a2, q_a3, Q_LESS, Q_SWAP) \
 do {					\
@@ -163,5 +166,7 @@ do {									\
 	 * on x86_64, this has the performance penalty of up to 5%. */	\
 	Q_LOOP(unsigned long, Q_N, Q_LESS, Q_SWAP);			\
 } while (0)
+
+#endif
 
 /* ex:set ts=8 sts=4 sw=4 noet: */
