@@ -20,6 +20,20 @@
  * SOFTWARE.
  */
 
+/*
+ * This is a traditional Quicksort implementation which mostly follows
+ * [Sedgewick 1978].  Sorting is performed entirely on array indices,
+ * while actual access to the array elements is abstracted out with the
+ * user-provided `LESS` and `SWAP` primitives.
+ *
+ * Synopsis:
+ *	QSORT(N, LESS, SWAP);
+ * where
+ *	N - the number of elements in A[];
+ *	LESS(i, j) - compares A[i] to A[j];
+ *	SWAP(i, j) - exchanges A[i] with A[j].
+ */
+
 #ifndef QSORT_H
 #define QSORT_H
 
