@@ -1,3 +1,53 @@
+# qsort.h - Quicksort as a C macro
+
+This is a traditional [Quicksort](https://en.wikipedia.org/wiki/Quicksort)
+implementation which for the most part follows
+[Robert Sedgewick's 1978 paper](http://penguin.ewu.edu/cscd300/Topic/AdvSorting/Sedgewick.pdf).
+It is implemented as a C macro, which means that comparisons can be inlined.
+A distinct feature of this implementation is that it works entirely on array
+indices, while actual access to the array elements is abstracted out with
+the `less` and `swap` primitives provided by the caller.  Here is an example
+of how to sort an array of integers:
+
+```c
+#include "qsort.h"
+void isort(int A[], size_t n)
+{
+    int tmp;
+#define LESS(i, j) A[i] < A[j]
+#define SWAP(i, j) tmp = A[i], A[i] = A[j], A[j] = tmp
+    QSORT(n, LESS, SWAP);
+}
+```
+Since access to the actual array is so completely abstracted out,
+the macro can be used to sort a few dependent arrays (which,
+to the best of my knowledge, no other implementation can do):
+
+```c
+#include "qsort.h"
+int sortByAge(size_t n, const char *names[], int ages[])
+{
+    const char *tmpName;
+    int tmpAge;
+#define LESS(i, j) ages[i] < ages[j]
+#define SWAP(i, j) tmpName  = names[i], tmpAge  = ages[i], \
+                   names[i] = names[j], ages[i] = ages[j], \
+                   names[j] = tmpName,  ages[j] = tmpAge
+    QSORT(n, LESS, SWAP);
+}
+```
+The sort is not [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability)
+(this is inherent to most of Quicksort variants).  To impose order among
+the names with the same age, the `LESS` macro can be enhanced like this:
+
+```c
+#define LESS(i, j) ages[i] <  ages[j] || \
+                  (ages[i] == ages[j] && strcmp(names[i], names[j]) < 0)
+```
+<sub>This Quicksort implementation is written by Alexey Tourbin.
+The source code is provided under the
+[MIT License](https://en.wikipedia.org/wiki/MIT_License).</sub>
+
 ## Performance
 
 A [benchmark](bench.cc) is provided which evaluates the performance
