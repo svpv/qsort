@@ -91,7 +91,8 @@ register, which `less` can't do.)
 
 Of course, to a considerable degree, performance depends on the compiler
 being used.  I found that my implementation is favoured by Clang, which
-also disrespects `std::sort` (using `-O3` doesn't help).
+also disrespects `std::sort` (using `-O3` doesn't help).  Sedgewick was
+right when he said we exposed ourselves to the whims of compilers.
 
 ```
 $ rm -f bench && make CXX=clang
