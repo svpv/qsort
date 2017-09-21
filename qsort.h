@@ -111,7 +111,7 @@ do {									\
  * Q_THRESH, the algorithm performs recursive partitioning.  When the size
  * drops below Q_THRESH, the algorithm switches to insertion sort.
  * The minimum valid value is probably 5 (with 5 items, the second and
- * the middle items, the middle itself being rounded down, are distinct. */
+ * the middle items, the middle itself being rounded down, are distinct). */
 #define Q_THRESH 16
 
 /* The main loop. */
