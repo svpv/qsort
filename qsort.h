@@ -24,7 +24,7 @@
  * This is a traditional Quicksort implementation which mostly follows
  * [Sedgewick 1978].  Sorting is performed entirely on array indices,
  * while actual access to the array elements is abstracted out with the
- * user-provided `LESS` and `SWAP` primitives.
+ * user-defined `LESS` and `SWAP` primitives.
  *
  * Synopsis:
  *	QSORT(N, LESS, SWAP);
