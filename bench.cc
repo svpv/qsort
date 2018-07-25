@@ -122,20 +122,7 @@ void svpv_strsort(const char *A[], size_t n)
  * Benchmarking
  */
 #include <inttypes.h>
-static inline uint64_t rdtsc(void)
-{
-#ifdef __x86_64__
-    uint32_t a, d;
-    asm volatile ("rdtsc" : "=a" (a), "=d" (d));
-    return a | ((uint64_t) d << 32);
-#elif defined(__i386__)
-    uint64_t x;
-    asm volatile ("rdtsc" : "=A" (x));
-    return x;
-#else
-#error "rdtsc not supported"
-#endif
-}
+#include <x86intrin.h>
 
 #define N (1 << 20)
 static int orig[N];
@@ -156,11 +143,11 @@ uint64_t bench_int(size_t n, void (*sort)(int A[], size_t n))
 	ncmp = 0;
 	// Don't reorder instructions.
 	asm volatile ("" ::: "memory");
-	uint64_t t = rdtsc();
+	uint64_t t = __rdtsc();
 	asm volatile ("" ::: "memory");
 	sort(copy, n);
 	asm volatile ("" ::: "memory");
-	t = rdtsc() - t;
+	t = __rdtsc() - t;
 	asm volatile ("" ::: "memory");
 	sum += t;
 	if (t < min)
@@ -189,11 +176,11 @@ uint64_t bench_str(size_t n, void (*strsort)(const char *A[], size_t n))
 	memcpy(copy_str, orig_str, sizeof orig_str);
 	ncmp = 0;
 	asm volatile ("" ::: "memory");
-	uint64_t t = rdtsc();
+	uint64_t t = __rdtsc();
 	asm volatile ("" ::: "memory");
 	strsort(copy_str, n);
 	asm volatile ("" ::: "memory");
-	t = rdtsc() - t;
+	t = __rdtsc() - t;
 	asm volatile ("" ::: "memory");
 	sum += t;
 	if (t < min)
