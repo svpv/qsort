@@ -4,7 +4,7 @@ This is a traditional [Quicksort](https://en.wikipedia.org/wiki/Quicksort)
 implementation which for the most part follows
 [Robert Sedgewick's 1978 paper](http://penguin.ewu.edu/cscd300/Topic/AdvSorting/Sedgewick.pdf).
 It is implemented as a C macro, which means that comparisons can be inlined.
-A distinct feature of this implementation is that it works entirely on array
+A distinctive feature of this implementation is that it works entirely on array
 indices, while actual access to the array elements is abstracted out with
 the `less` and `swap` primitives provided by the caller.  Here is an example
 of how to sort an array of integers:
