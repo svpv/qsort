@@ -122,7 +122,7 @@ void svpv_strsort(const char *A[], size_t n)
  * Benchmarking
  */
 #include <inttypes.h>
-#include <x86intrin.h>
+#include <time.h>
 
 #define N (1 << 20)
 static int orig[N];
@@ -131,24 +131,19 @@ static int copy[N];
 #include <string.h>
 #include <unistd.h>
 
-uint64_t bench_int(size_t n, void (*sort)(int A[], size_t n))
+double bench_int(size_t n, void (*sort)(int A[], size_t n))
 {
     // Make 4 runs, throw away min and max, average the other two.
-    uint64_t min = UINT64_MAX, max = 0, sum = 0;
+    clock_t min = UINT64_MAX, max = 0, sum = 0;
     for (int i = 0; i < 4; i++) {
 	usleep(1);
 	memcpy(copy, orig, sizeof orig);
 	sort(copy, n);
 	memcpy(copy, orig, sizeof orig);
 	ncmp = 0;
-	// Don't reorder instructions.
-	asm volatile ("" ::: "memory");
-	uint64_t t = __rdtsc();
-	asm volatile ("" ::: "memory");
+	clock_t t = clock();
 	sort(copy, n);
-	asm volatile ("" ::: "memory");
-	t = __rdtsc() - t;
-	asm volatile ("" ::: "memory");
+	t = clock() - t;
 	sum += t;
 	if (t < min)
 	    min = t;
@@ -159,29 +154,25 @@ uint64_t bench_int(size_t n, void (*sort)(int A[], size_t n))
     for (size_t i = 1; i < n; i++)
 	assert(copy[i-1] <= copy[i]);
     sum -= min + max;
-    return sum / 2;
+    return (double) (sum) / 2 * CLOCKS_PER_SEC;
 }
 
 #define N_STR (1 << 20)
 static const char *orig_str[N];
 static const char *copy_str[N];
 
-uint64_t bench_str(size_t n, void (*strsort)(const char *A[], size_t n))
+double bench_str(size_t n, void (*strsort)(const char *A[], size_t n))
 {
-    uint64_t min = UINT64_MAX, max = 0, sum = 0;
+    clock_t min = UINT64_MAX, max = 0, sum = 0;
     for (int i = 0; i < 4; i++) {
 	usleep(1);
 	memcpy(copy_str, orig_str, sizeof orig_str);
 	strsort(copy_str, n);
 	memcpy(copy_str, orig_str, sizeof orig_str);
 	ncmp = 0;
-	asm volatile ("" ::: "memory");
-	uint64_t t = __rdtsc();
-	asm volatile ("" ::: "memory");
+	clock_t t = clock();
 	strsort(copy_str, n);
-	asm volatile ("" ::: "memory");
-	t = __rdtsc() - t;
-	asm volatile ("" ::: "memory");
+	t = clock() - t;
 	sum += t;
 	if (t < min)
 	    min = t;
@@ -191,7 +182,7 @@ uint64_t bench_str(size_t n, void (*strsort)(const char *A[], size_t n))
     for (size_t i = 1; i < n; i++)
 	assert(strcmp(copy_str[i-1], copy_str[i]) <= 0);
     sum -= min + max;
-    return sum / 2;
+    return (double) (sum) / 2 * CLOCKS_PER_SEC;
 }
 
 #include <getopt.h>
@@ -241,30 +232,30 @@ int main(int argc, char **argv)
 	    if (n == N_STR)
 		break;
 	}
-	printf("stdlib\t%12" PRIu64 "\t", bench_str(n, stdlib_strsort));
+	printf("stdlib\t %lf\t", bench_str(n, stdlib_strsort));
 	printf("%zu\n", ncmp);
 #ifdef __cplusplus
-	printf("stl\t%12" PRIu64 "\t", bench_str(n, stl_strsort));
+	printf("stl\t% %lf\t", bench_str(n, stl_strsort));
 	printf("%zu\n", ncmp);
 #endif
-	printf("mjt\t%12" PRIu64 "\t", bench_str(n, mjt_strsort));
+	printf("mjt\t %lf\t", bench_str(n, mjt_strsort));
 	printf("%zu\n", ncmp);
-	printf("svpv\t%12" PRIu64 "\t", bench_str(n, svpv_strsort));
+	printf("svpv\t %lf\t", bench_str(n, svpv_strsort));
 	printf("%zu\n", ncmp);
     }
     else {
 	size_t n = N;
 	for (size_t i = 0; i < N; i++)
 	    orig[i] = rand();
-	printf("stdlib\t%12" PRIu64 "\t", bench_int(n, stdlib_isort));
+	printf("stdlib\t %lf\t", bench_int(n, stdlib_isort));
 	printf("%zu\n", ncmp);
 #ifdef __cplusplus
-	printf("stl\t%12" PRIu64 "\t", bench_int(n, stl_isort));
+	printf("stl\t %lf\t", bench_int(n, stl_isort));
 	printf("%zu\n", ncmp);
 #endif
-	printf("mjt\t%12" PRIu64 "\t", bench_int(n, mjt_isort));
+	printf("mjt\t %lf\t", bench_int(n, mjt_isort));
 	printf("%zu\n", ncmp);
-	printf("svpv\t%12" PRIu64 "\t", bench_int(n, svpv_isort));
+	printf("svpv\t %lf\t", bench_int(n, svpv_isort));
 	printf("%zu\n", ncmp);
     }
     return 0;
